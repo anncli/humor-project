@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { siteConfig } from "@/config/site";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Humor Project | Assignment 1",
-  description: "A sample Next.js app for Assignment 1.",
+  title: `${siteConfig.name} | ${siteConfig.assignment}`,
+  description: siteConfig.description,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
