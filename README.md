@@ -1,11 +1,12 @@
-# Meme Rankings
+# Morningside Memes
 
-A small Next.js meme-ranking feed backed by Supabase and deployed through Vercel. The home page fetches and ranks memes by upvote count.
+Where Columbians turn pain into punchlines. Morningside Memes is a student-made meme-ranking feed backed by Supabase and deployed through Vercel.
 
 ## Features
 
 - Fetches meme records from Supabase at request time.
-- Renders responsive cards with an image, caption, rank, and upvote total.
+- Renders a carnival-style, responsive ranking board with meme cards, rank, and Roar-ee points.
+- Highlights the top three on a podium, with a crown for the #1 meme.
 - Uses Row Level Security (RLS) to give visitors read-only access to the feed.
 - Includes a small, one-time sample dataset of 12 public Crackd examples for visualization.
 
@@ -70,7 +71,7 @@ The initial sample data was added directly to the connected Supabase project. It
 
 ## Sample data source
 
-The current feed contains 12 public Crackd examples, added once for a class-demo visualization. There is no scheduled scraper, crawler, or import script. Any future import should respect the source's terms and preserve appropriate attribution or permissions.
+The current feed contains 12 public Crackd examples, added once for a class-demo visualization. The page attributes this sample content with “Based on crackd.ai.” There is no scheduled scraper, crawler, or import script. Any future import should respect the source's terms and preserve appropriate attribution or permissions.
 
 ## Project structure
 

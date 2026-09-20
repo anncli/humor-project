@@ -3,7 +3,7 @@ import { siteConfig } from "@/config/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: `${siteConfig.name} | ${siteConfig.assignment}`,
+  title: siteConfig.name,
   description: siteConfig.description,
 };
 

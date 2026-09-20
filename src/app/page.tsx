@@ -1,5 +1,6 @@
-import Image from "next/image";
 import { connection } from "next/server";
+import { MemeCard, type Meme } from "@/components/meme-card";
+import { RankingPodium } from "@/components/ranking-podium";
 import { supabase } from "@/lib/supabase";
 
 export default async function Home() {
@@ -12,58 +13,79 @@ export default async function Home() {
 
   if (error) {
     return (
-      <main className="grid min-h-screen place-items-center bg-slate-50 px-6 text-center text-slate-950">
-        <p>We couldn&apos;t load the memes right now. Please try again soon.</p>
+      <main className="carnival-page grid min-h-screen place-items-center px-6 text-center">
+        <p className="error-ticket">The campus comedy board is taking an intermission. Please try again soon.</p>
       </main>
     );
   }
 
+  const rankedMemes = memes as Meme[];
+  const podiumMemes = rankedMemes.slice(0, 3);
+  const remainingMemes = rankedMemes.slice(3);
+  const hasFullPodium = podiumMemes.length === 3;
+  const gridMemes = hasFullPodium ? remainingMemes : rankedMemes;
+  const gridStartingRank = hasFullPodium ? 4 : 1;
+
   return (
-    <main className="min-h-screen bg-slate-50 px-6 py-16 text-slate-950">
-      <section className="mx-auto max-w-5xl">
-        <header className="mb-10 text-center">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-600">
-            Supabase-powered
-          </p>
-          <h1 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
-            Meme Rankings
+    <main className="carnival-page px-4 py-8 sm:px-6 sm:py-12">
+      <div className="confetti" aria-hidden="true">
+        <span />
+        <span />
+        <span />
+        <span />
+        <span />
+        <span />
+      </div>
+      <section className="carnival-shell">
+        <header className="carnival-header">
+          <p className="marquee-kicker">Columbia University</p>
+          <h1 className="carnival-title">
+            <span>Morningside</span> Memes
           </h1>
-          <p className="mt-3 text-slate-600">
-            The most upvoted memes from our database.
+          <p className="carnival-subtitle">
+            Where Columbians turn pain into punchlines.
           </p>
+          <div className="marquee-strip" aria-label="Student-made silliness and student-voted leaderboard">
+            <span aria-hidden="true">✦</span>
+            student-made silliness
+            <span aria-hidden="true">✦</span>
+            student-voted leaderboard
+            <span aria-hidden="true">✦</span>
+          </div>
         </header>
 
-        {memes.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-600">
-            No memes have been added yet.
+        {rankedMemes.length === 0 ? (
+          <p className="empty-ticket">
+            No memes have made it to campus yet. Check back after the next act!
           </p>
         ) : (
-          <ol className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {memes.map((meme, index) => (
-              <li
-                key={meme.id}
-                className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
-              >
-                <Image
-                  src={meme.image_url}
-                  alt={meme.caption}
-                  width={1200}
-                  height={800}
-                  className="aspect-[3/2] w-full object-cover"
-                />
-                <div className="p-5">
-                  <p className="text-sm font-semibold text-blue-600">
-                    #{index + 1} ranked meme
-                  </p>
-                  <p className="mt-2 text-lg font-medium">{meme.caption}</p>
-                  <p className="mt-4 text-sm text-slate-600">
-                    {meme.upvote_count} upvotes
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ol>
+          <>
+            {hasFullPodium ? <RankingPodium memes={podiumMemes} /> : null}
+            <section className="ranking-section" aria-labelledby="ranking-heading">
+              <div className="section-heading">
+                <span aria-hidden="true">✦</span>
+                <h2 id="ranking-heading">
+                  {hasFullPodium ? "More from campus" : "Campus ranking board"}
+                </h2>
+                <span aria-hidden="true">✦</span>
+              </div>
+              <ol className="meme-grid" start={gridStartingRank}>
+                {gridMemes.map((meme, index) => (
+                  <MemeCard
+                    key={meme.id}
+                    meme={meme}
+                    rank={index + gridStartingRank}
+                  />
+                ))}
+              </ol>
+            </section>
+          </>
         )}
+        <footer className="source-footer">
+          <a href="https://www.crackd.ai/" target="_blank" rel="noreferrer">
+            Based on crackd.ai
+          </a>
+        </footer>
       </section>
     </main>
   );
