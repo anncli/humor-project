@@ -2,15 +2,15 @@
 
 Where Columbians turn pain into punchlines. Morningside Memes is a student-made meme-ranking feed backed by Supabase and deployed through Vercel.
 
-## Features
+## What it does
 
 - Fetches meme records from Supabase at request time.
 - Renders a carnival-style, responsive ranking board with meme cards, rank, and Roar-ee points.
 - Highlights the top three on a podium, with a crown for the #1 meme.
 - Uses Row Level Security (RLS) to give visitors read-only access to the feed.
-- Includes a small, one-time sample dataset of 12 public Crackd examples for visualization.
+- Displays a one-time import of the current top 20 public Crackd examples for visualization.
 
-## Local development
+## Run locally
 
 Install dependencies, create a local environment file, and start the development server:
 
@@ -20,22 +20,51 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Set the following values in `.env.local`:
+Add your project credentials to `.env.local`:
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_legacy_anon_key
 ```
 
-Use the Supabase project URL and legacy anon key from **Settings → API Keys**. These names match the client setup in `src/lib/supabase.ts`.
+Find the Supabase project URL and legacy anon key in **Settings → API Keys**. These names match the client setup in `src/lib/supabase.ts`.
 
 > `.env.local` is ignored by Git. Never commit credentials or use a Supabase `service_role` / secret key in this frontend app.
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Supabase database
+### Optional: connect Supabase MCP to Codex
 
-The app reads from `public.memes`:
+> **Note:** Supabase MCP's default OAuth setup can be unreliable with Codex and may fail during OAuth client registration with scope-related errors. This project uses a Supabase Personal Access Token passed to Codex as a bearer token instead.
+
+Create a Supabase Personal Access Token, then export it in your terminal:
+
+```bash
+export SUPABASE_ACCESS_TOKEN='YOUR_SUPABASE_PERSONAL_ACCESS_TOKEN'
+```
+
+Add the Supabase MCP server, replacing `YOUR_PROJECT_REF` with the reference from your Supabase project URL:
+
+```bash
+codex mcp add supabase \
+  --url 'https://mcp.supabase.com/mcp?project_ref=YOUR_PROJECT_REF&features=docs%2Cdatabase%2Cdebugging%2Cdevelopment%2Cfunctions%2Cbranching' \
+  --bearer-token-env-var SUPABASE_ACCESS_TOKEN
+```
+
+Verify the connection, then start Codex in the same terminal session:
+
+```bash
+codex mcp get supabase
+codex
+```
+
+Inside Codex, run `/mcp`; Supabase should appear as connected. The `export` applies only to the current terminal session. To persist it across new sessions, add the export command to your shell configuration (for example, `~/.zshrc`).
+
+> **Important:** Never commit your Supabase Personal Access Token or any other secrets to Git.
+
+## Data model and access
+
+The app reads leaderboard entries from `public.memes`:
 
 | Column | Type | Purpose |
 | --- | --- | --- |
@@ -67,11 +96,20 @@ to anon, authenticated
 using (true);
 ```
 
-The initial sample data was added directly to the connected Supabase project. It is remote data, so it is not stored in this repository or included in Git commits.
+The leaderboard data lives in the connected Supabase project, not in this repository or its Git history.
+
+### Data flow
+
+1. `src/lib/supabase.ts` creates the shared Supabase client using `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+2. On each request, the server-rendered home page in `src/app/page.tsx` queries `public.memes` for `id`, `image_url`, `caption`, and `upvote_count`, ordered from highest to lowest `upvote_count`.
+3. The first three rows are passed to `RankingPodium`, which renders each one as a `MemeCard` in the podium layout. The remaining rows use the same `MemeCard` component in the ranking grid.
+4. Each card renders the row's `image_url` with Next.js `Image`, its `caption` as accessible alt text and visible copy, and its `upvote_count` as Roar-ee points. The position in the sorted result becomes the displayed rank.
+
+Visitors can only read the feed through the `Public can view memes` RLS policy. Use a privileged server-side or administrative connection for imports and other writes—never expose those credentials to the browser.
 
 ## Sample data source
 
-The current feed contains 12 public Crackd examples, added once for a class-demo visualization. The page attributes this sample content with “Based on crackd.ai.” There is no scheduled scraper, crawler, or import script. Any future import should respect the source's terms and preserve appropriate attribution or permissions.
+The current feed contains the public Crackd All Time top 20, imported once for a class-demo visualization. The page attributes this content with “Based on crackd.ai.” There is no scheduled scraper, crawler, or import script. Any future import should respect the source's terms and preserve appropriate attribution or permissions.
 
 ## Project structure
 
@@ -81,7 +119,7 @@ The current feed contains 12 public Crackd examples, added once for a class-demo
 - `src/lib/supabase.ts` creates the shared Supabase client from environment variables.
 - `public/` is reserved for static assets used by the app.
 
-## Available scripts
+## Commands
 
 ```bash
 npm run dev
@@ -92,7 +130,7 @@ npm run start
 
 ## Deployment
 
-Import this repository into Vercel. Vercel detects the Next.js framework automatically.
+Import the repository into Vercel; it detects Next.js automatically.
 
 In **Project Settings → Environment Variables**, add these variables for Production and Preview deployments:
 
@@ -101,4 +139,4 @@ NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY
 ```
 
-Use the same values as `.env.local`, then redeploy. The `NEXT_PUBLIC_` variables are included in the browser bundle; the anon key is intended for this public client and is protected by the database's RLS policy. Do not add a Supabase service-role or secret key to Vercel for this frontend.
+Use the same values as `.env.local`, then redeploy. `NEXT_PUBLIC_` variables are included in the browser bundle, so do not add a Supabase service-role or secret key to Vercel for this frontend.
