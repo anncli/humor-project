@@ -128,15 +128,16 @@ body {
 
 .podium-section,
 .ranking-section {
+  display: flex;
+  flex-direction: column;
   margin-top: 2rem;
+  margin-bottom: 1rem;
   padding: clamp(1rem, 3vw, 2rem);
   background: rgb(255 247 214 / 96%);
   border: 4px solid var(--carnival-ink);
   border-radius: 1rem;
   box-shadow: 8px 8px 0 rgb(13 7 31 / 65%);
 }
-
-.ranking-section { margin-bottom: 1rem; }
 
 .section-heading {
   display: flex;
@@ -169,7 +170,63 @@ body {
 .podium-list { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: end; }
 .podium-card[data-rank="1"] { grid-column: 1 / -1; }
 
-.meme-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); }
+.meme-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr)); }
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: auto 0 0;
+  padding-top: 2rem;
+}
+
+.pagination-button {
+  min-width: 6.5rem;
+  margin: 0;
+  padding: 0.6rem 0.9rem;
+  border: 3px solid var(--carnival-ink);
+  border-radius: 999px;
+  color: var(--carnival-ink);
+  background: var(--carnival-yellow);
+  box-shadow: 3px 3px 0 var(--carnival-ink);
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+.pagination-button:not(.pagination-button-disabled):hover {
+  background: var(--carnival-pink);
+  color: white;
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 var(--carnival-ink);
+}
+
+.pagination-button:focus-visible {
+  outline: 3px solid var(--carnival-blue);
+  outline-offset: 3px;
+}
+
+.pagination-button-disabled {
+  color: rgb(42 23 67 / 45%);
+  background: rgb(42 23 67 / 10%);
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.pagination-status {
+  margin: 0;
+  color: var(--carnival-ink);
+  font-size: 0.85rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
 
 .meme-ticket {
   position: relative;
@@ -178,6 +235,8 @@ body {
 
 .meme-ticket article {
   position: relative;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   height: 100%;
   background: var(--carnival-cream);
@@ -227,6 +286,7 @@ body {
 
 .meme-image-frame {
   position: relative;
+  flex: 0 0 auto;
   aspect-ratio: 3 / 2;
   overflow: hidden;
   background: repeating-linear-gradient(45deg, #ffd34d 0 10px, #ff8b72 10px 20px);
@@ -240,7 +300,12 @@ body {
   background: white;
 }
 
-.ticket-copy { padding: 1rem 1rem 1.2rem; }
+.ticket-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 1rem 1rem 1.2rem;
+}
 .ticket-label { color: var(--carnival-red); }
 
 .meme-caption {
@@ -252,7 +317,8 @@ body {
 }
 
 .vote-count {
-  margin: 0.85rem 0 0;
+  margin: auto 0 0;
+  padding-top: 0.85rem;
   color: var(--carnival-violet);
   font-size: 0.8rem;
   font-weight: 950;
@@ -321,6 +387,11 @@ body {
   .podium-card[data-rank="2"] { grid-column: 1; grid-row: 1; }
   .podium-card[data-rank="3"] { grid-column: 3; grid-row: 1; }
   .podium-card[data-rank="1"] .meme-caption { font-size: 1.12rem; }
+}
+
+@media (min-width: 75rem) {
+  .meme-grid { grid-auto-rows: 26rem; }
+  .ranking-section { min-height: 40rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

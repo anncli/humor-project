@@ -8,7 +8,7 @@ Where Columbians turn pain into punchlines. Morningside Memes is a student-made 
 - Renders a carnival-style, responsive ranking board with meme cards, rank, and Roar-ee points.
 - Highlights the top three on a podium, with a crown for the #1 meme.
 - Uses Row Level Security (RLS) to give visitors read-only access to the feed.
-- Displays a one-time import of the current top 20 public Crackd examples for visualization.
+- Displays a one-time import of top public Crackd examples for visualization.
 
 ## Run locally
 
@@ -101,15 +101,15 @@ The leaderboard data lives in the connected Supabase project, not in this reposi
 ### Data flow
 
 1. `src/lib/supabase.ts` creates the shared Supabase client using `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
-2. On each request, the server-rendered home page in `src/app/page.tsx` queries `public.memes` for `id`, `image_url`, `caption`, and `upvote_count`, ordered from highest to lowest `upvote_count`.
-3. The first three rows are passed to `RankingPodium`, which renders each one as a `MemeCard` in the podium layout. The remaining rows use the same `MemeCard` component in the ranking grid.
+2. On each request, the server-rendered home page in `src/app/page.tsx` counts `public.memes` and fetches the top three rows for the podium. The podium and ranking queries order by `upvote_count` descending and `id` ascending, so tied scores keep a stable order.
+3. The first three rows are passed to `RankingPodium`, which renders each one as a `MemeCard` in the podium layout. The remaining rows are fetched four at a time with the `?page=` URL parameter and use the same `MemeCard` component in the ranking grid.
 4. Each card renders the row's `image_url` with Next.js `Image`, its `caption` as accessible alt text and visible copy, and its `upvote_count` as Roar-ee points. The position in the sorted result becomes the displayed rank.
 
 Visitors can only read the feed through the `Public can view memes` RLS policy. Use a privileged server-side or administrative connection for imports and other writes—never expose those credentials to the browser.
 
 ## Sample data source
 
-The current feed contains the public Crackd All Time top 20, imported once for a class-demo visualization. The page attributes this content with “Based on crackd.ai.” There is no scheduled scraper, crawler, or import script. Any future import should respect the source's terms and preserve appropriate attribution or permissions.
+The current feed contains 23 public Crackd All Time entries, imported once for a class-demo visualization. The page attributes this content with “Based on crackd.ai.” There is no scheduled scraper, crawler, or import script. Any future import should respect the source's terms and preserve appropriate attribution or permissions.
 
 ## Project structure
 
